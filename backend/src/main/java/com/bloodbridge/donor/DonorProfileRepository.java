@@ -1,5 +1,5 @@
 package com.bloodbridge.donor;
-
+import java.util.List;
 import com.bloodbridge.common.BloodGroup;
 import com.bloodbridge.common.VerificationStatus;
 import org.springframework.data.domain.Page;
@@ -14,4 +14,10 @@ public interface DonorProfileRepository extends JpaRepository<DonorProfile, Long
     Page<DonorProfile> findByVerificationStatusAndBloodGroup(VerificationStatus status, BloodGroup bloodGroup, Pageable pageable);
     Page<DonorProfile> findByVerificationStatusAndAvailableToDonate(VerificationStatus status, boolean available, Pageable pageable);
     boolean existsByUserId(Long userId);
+Page<DonorProfile> findByVerificationStatusAndAvailableToDonateAndBloodGroup(
+        VerificationStatus status, boolean available, BloodGroup bloodGroup, Pageable pageable);
+List<DonorProfile> findAllByVerificationStatusAndAvailableToDonateAndBloodGroup(
+        VerificationStatus status,
+        boolean available,
+        BloodGroup bloodGroup);
 }

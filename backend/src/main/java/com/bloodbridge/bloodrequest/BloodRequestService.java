@@ -1,11 +1,16 @@
+
 package com.bloodbridge.bloodrequest;
 
 import com.bloodbridge.bloodrequest.dto.BloodRequestCreateDTO;
 import com.bloodbridge.bloodrequest.dto.BloodRequestResponse;
 import com.bloodbridge.bloodrequest.dto.BloodRequestUpdateDTO;
+import com.bloodbridge.common.BloodGroup;
 import com.bloodbridge.common.NotificationType;
 import com.bloodbridge.common.RequestStatus;
 import com.bloodbridge.common.Role;
+import com.bloodbridge.common.VerificationStatus;
+import com.bloodbridge.donor.DonorProfile;
+import com.bloodbridge.donor.DonorProfileRepository;
 import com.bloodbridge.exception.ForbiddenException;
 import com.bloodbridge.exception.InvalidStateTransitionException;
 import com.bloodbridge.exception.ResourceNotFoundException;
@@ -20,6 +25,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Transactional
 public class BloodRequestService {
@@ -27,15 +34,18 @@ public class BloodRequestService {
     private final BloodRequestRepository bloodRequestRepository;
     private final PatientProfileRepository patientProfileRepository;
     private final HospitalRepository hospitalRepository;
+    private final DonorProfileRepository donorProfileRepository;
     private final NotificationService notificationService;
 
     public BloodRequestService(BloodRequestRepository bloodRequestRepository,
                                PatientProfileRepository patientProfileRepository,
                                HospitalRepository hospitalRepository,
+                               DonorProfileRepository donorProfileRepository,
                                NotificationService notificationService) {
         this.bloodRequestRepository = bloodRequestRepository;
         this.patientProfileRepository = patientProfileRepository;
         this.hospitalRepository = hospitalRepository;
+        this.donorProfileRepository = donorProfileRepository;
         this.notificationService = notificationService;
     }
 
@@ -68,9 +78,30 @@ public class BloodRequestService {
         notificationService.createNotification(
                 patientProfile.getUser(),
                 "Blood Request Created",
-                "Your blood request for " + request.getUnitsRequired() + " units of " + request.getBloodGroup().getLabel() + " has been created successfully.",
-                NotificationType.SYSTEM_ALERT
+                "Your blood request for " + request.getUnitsRequired()
+                        + " units of " + request.getBloodGroup().getLabel()
+                        + " has been created successfully.",
+                NotificationType.BLOOD_REQUEST_CREATED
         );
+
+        List<DonorProfile> matchingDonors =
+                donorProfileRepository.findAllByVerificationStatusAndAvailableToDonateAndBloodGroup(
+                        VerificationStatus.VERIFIED,
+                        true,
+                        request.getBloodGroup()
+                );
+
+        for (DonorProfile donor : matchingDonors) {
+            notificationService.createNotification(
+                    donor.getUser(),
+                    "Matching Blood Request",
+                    "A new blood request for " + request.getBloodGroup().getLabel()
+                            + " has been created. Units required: "
+                            + request.getUnitsRequired()
+                            + ". Please check BloodBridge for details.",
+                    NotificationType.BLOOD_REQUEST_CREATED
+            );
+        }
 
         return toResponse(saved);
     }
@@ -123,7 +154,8 @@ public class BloodRequestService {
 
         if (dto.status() != null && dto.status() != request.getStatus()) {
             if (!request.getStatus().canTransitionTo(dto.status())) {
-                throw new InvalidStateTransitionException("Cannot transition request from " + request.getStatus() + " to " + dto.status());
+                throw new InvalidStateTransitionException(
+                        "Cannot transition request from " + request.getStatus() + " to " + dto.status());
             }
             request.setStatus(dto.status());
 
@@ -163,7 +195,8 @@ public class BloodRequestService {
         }
 
         if (!request.getStatus().canTransitionTo(RequestStatus.CANCELLED)) {
-            throw new InvalidStateTransitionException("Cannot cancel request in status: " + request.getStatus());
+            throw new InvalidStateTransitionException(
+                    "Cannot cancel request in status: " + request.getStatus());
         }
 
         request.setStatus(RequestStatus.CANCELLED);
