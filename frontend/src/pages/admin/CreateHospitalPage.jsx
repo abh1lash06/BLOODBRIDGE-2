@@ -211,6 +211,7 @@ export const CreateHospitalPage = () => {
               type="submit"
               variant="primary"
               size="lg"
+              className="w-full sm:w-auto min-h-[44px]"
               isLoading={isSubmitting || createMutation.isPending}
             >
               <UserPlus className="w-4 h-4 mr-2" />

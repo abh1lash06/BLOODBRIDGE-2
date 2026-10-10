@@ -25,16 +25,15 @@ public class NotificationController {
     }
 
     @PatchMapping("/{id}/read")
-    public ResponseEntity<Void> markAsRead(@AuthenticationPrincipal UserPrincipal currentUser,
-                                           @PathVariable Long id) {
-        notificationService.markAsRead(currentUser, id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<NotificationResponse> markAsRead(@AuthenticationPrincipal UserPrincipal currentUser,
+                                                           @PathVariable Long id) {
+        return ResponseEntity.ok(notificationService.markAsRead(currentUser, id));
     }
 
     @PatchMapping("/read-all")
     public ResponseEntity<Void> markAllAsRead(@AuthenticationPrincipal UserPrincipal currentUser) {
         notificationService.markAllAsRead(currentUser);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/unread-count")

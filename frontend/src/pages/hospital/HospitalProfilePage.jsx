@@ -72,16 +72,16 @@ export const HospitalProfilePage = () => {
 
   return (
     <div className="space-y-6 max-w-3xl">
-      <div className="p-6 bg-white rounded-2xl border border-charcoal-200 flex items-center justify-between">
+      <div className="p-4 sm:p-6 bg-white rounded-2xl border border-charcoal-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-crimson-600 text-white flex items-center justify-center font-bold">
+          <div className="w-12 h-12 rounded-xl bg-crimson-600 text-white flex items-center justify-center font-bold shrink-0">
             <Hospital className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-charcoal-900">
+            <h1 className="text-xl sm:text-2xl font-bold text-charcoal-900">
               {hospital.hospitalName}
             </h1>
-            <p className="text-sm text-charcoal-500">
+            <p className="text-sm text-charcoal-500 break-all">
               Registration No: <span className="font-semibold">{hospital.registrationNumber}</span>
             </p>
           </div>
@@ -91,6 +91,7 @@ export const HospitalProfilePage = () => {
           <Button
             variant="outline"
             size="sm"
+            className="w-full sm:w-auto min-h-[44px]"
             onClick={() => setIsEditing(true)}
           >
             <Edit className="w-4 h-4 mr-1.5" />
@@ -156,10 +157,11 @@ export const HospitalProfilePage = () => {
               </div>
             </div>
 
-            <div className="flex justify-end gap-3 pt-4 border-t border-charcoal-100">
+            <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-4 border-t border-charcoal-100">
               <Button
                 type="button"
                 variant="outline"
+                className="w-full sm:w-auto min-h-[44px]"
                 onClick={() => {
                   reset();
                   setIsEditing(false);
@@ -170,6 +172,7 @@ export const HospitalProfilePage = () => {
               <Button
                 type="submit"
                 variant="primary"
+                className="w-full sm:w-auto min-h-[44px]"
                 isLoading={isSubmitting || updateMutation.isPending}
               >
                 <Save className="w-4 h-4 mr-1.5" />

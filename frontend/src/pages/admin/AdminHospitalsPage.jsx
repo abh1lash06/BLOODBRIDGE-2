@@ -38,7 +38,7 @@ export const AdminHospitalsPage = () => {
   const verifyMutation = useMutation({
     mutationFn: (id) => adminApi.verifyHospital(id),
     onSuccess: () => {
-      queryClient.invalidateQueries(['admin', 'pendingHospitals']);
+      queryClient.invalidateQueries({ queryKey: ['admin', 'pendingHospitals'] });
       toast.success('Hospital verified successfully.');
       setVerifyingHospital(null);
     },
@@ -53,7 +53,7 @@ export const AdminHospitalsPage = () => {
   const unverifyMutation = useMutation({
     mutationFn: (id) => adminApi.unverifyHospital(id),
     onSuccess: () => {
-      queryClient.invalidateQueries(['admin', 'pendingHospitals']);
+      queryClient.invalidateQueries({ queryKey: ['admin', 'pendingHospitals'] });
       toast.success('Hospital status set to unverified.');
       setUnverifyingHospital(null);
     },
@@ -97,59 +97,115 @@ export const AdminHospitalsPage = () => {
             />
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-charcoal-50 border-b border-charcoal-200 text-xs font-semibold text-charcoal-500 uppercase tracking-wider">
-                <tr>
-                  <th className="py-3.5 px-4">Hospital Name</th>
-                  <th className="py-3.5 px-4">Registration #</th>
-                  <th className="py-3.5 px-4">Location</th>
-                  <th className="py-3.5 px-4">Phone</th>
-                  <th className="py-3.5 px-4">Current Status</th>
-                  <th className="py-3.5 px-4 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-charcoal-100">
-                {hospitals.map((hosp) => (
-                  <tr key={hosp.id} className="hover:bg-charcoal-50/50 transition-colors">
-                    <td className="py-3.5 px-4 font-semibold text-charcoal-900">
-                      {hosp.hospitalName}
-                    </td>
-                    <td className="py-3.5 px-4 font-mono text-xs text-charcoal-700">
-                      {hosp.registrationNumber}
-                    </td>
-                    <td className="py-3.5 px-4 text-charcoal-600 text-xs">
-                      {hosp.city ? `${hosp.city}, ${hosp.state || ''}` : 'None'}
-                    </td>
-                    <td className="py-3.5 px-4 text-charcoal-600 text-xs">
-                      {hosp.contactPhone || 'None'}
-                    </td>
-                    <td className="py-3.5 px-4">
-                      <Badge variant="warning">{hosp.verificationStatus}</Badge>
-                    </td>
-                    <td className="py-3.5 px-4 text-right space-x-2">
-                      <Button
-                        variant="success"
-                        size="sm"
-                        onClick={() => setVerifyingHospital(hosp)}
-                      >
-                        <CheckCircle className="w-3.5 h-3.5 mr-1" />
-                        Verify
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setUnverifyingHospital(hosp)}
-                      >
-                        <ShieldAlert className="w-3.5 h-3.5 mr-1" />
-                        Unverify
-                      </Button>
-                    </td>
+          <>
+            {/* Mobile Cards View (< 768px) */}
+            <div className="block md:hidden divide-y divide-charcoal-100">
+              {hospitals.map((hosp) => (
+                <div key={hosp.id} className="p-4 space-y-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <div>
+                      <p className="font-bold text-charcoal-900 text-sm">
+                        {hosp.hospitalName}
+                      </p>
+                      <p className="font-mono text-xs text-charcoal-500">
+                        {hosp.registrationNumber}
+                      </p>
+                    </div>
+                    <Badge variant="warning">{hosp.verificationStatus}</Badge>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 text-xs text-charcoal-600">
+                    <div>
+                      <span className="text-charcoal-400 block mb-0.5">Location</span>
+                      <span className="font-medium text-charcoal-800">
+                        {hosp.city ? `${hosp.city}, ${hosp.state || ''}` : 'None'}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-charcoal-400 block mb-0.5">Phone</span>
+                      <span className="font-medium text-charcoal-800">{hosp.contactPhone || 'None'}</span>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t border-charcoal-100 flex justify-end gap-2">
+                    <Button
+                      variant="success"
+                      size="sm"
+                      onClick={() => setVerifyingHospital(hosp)}
+                      className="min-h-[38px] text-xs"
+                    >
+                      <CheckCircle className="w-3.5 h-3.5 mr-1" />
+                      Verify
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setUnverifyingHospital(hosp)}
+                      className="min-h-[38px] text-xs"
+                    >
+                      <ShieldAlert className="w-3.5 h-3.5 mr-1" />
+                      Unverify
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop Table View (>= 768px) */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead className="bg-charcoal-50 border-b border-charcoal-200 text-xs font-semibold text-charcoal-500 uppercase tracking-wider">
+                  <tr>
+                    <th className="py-3.5 px-4">Hospital Name</th>
+                    <th className="py-3.5 px-4">Registration #</th>
+                    <th className="py-3.5 px-4">Location</th>
+                    <th className="py-3.5 px-4">Phone</th>
+                    <th className="py-3.5 px-4">Current Status</th>
+                    <th className="py-3.5 px-4 text-right">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-charcoal-100">
+                  {hospitals.map((hosp) => (
+                    <tr key={hosp.id} className="hover:bg-charcoal-50/50 transition-colors">
+                      <td className="py-3.5 px-4 font-semibold text-charcoal-900">
+                        {hosp.hospitalName}
+                      </td>
+                      <td className="py-3.5 px-4 font-mono text-xs text-charcoal-700">
+                        {hosp.registrationNumber}
+                      </td>
+                      <td className="py-3.5 px-4 text-charcoal-600 text-xs">
+                        {hosp.city ? `${hosp.city}, ${hosp.state || ''}` : 'None'}
+                      </td>
+                      <td className="py-3.5 px-4 text-charcoal-600 text-xs">
+                        {hosp.contactPhone || 'None'}
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <Badge variant="warning">{hosp.verificationStatus}</Badge>
+                      </td>
+                      <td className="py-3.5 px-4 text-right space-x-2">
+                        <Button
+                          variant="success"
+                          size="sm"
+                          onClick={() => setVerifyingHospital(hosp)}
+                        >
+                          <CheckCircle className="w-3.5 h-3.5 mr-1" />
+                          Verify
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setUnverifyingHospital(hosp)}
+                        >
+                          <ShieldAlert className="w-3.5 h-3.5 mr-1" />
+                          Unverify
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
 
         <Pagination
