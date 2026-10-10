@@ -71,6 +71,12 @@ class NotificationIntegrationTest {
     private NotificationRepository notificationRepository;
 
     @Autowired
+    private com.bloodbridge.bloodrequest.donorresponse.DonorResponseRepository donorResponseRepository;
+
+    @Autowired
+    private com.bloodbridge.donation.DonationRepository donationRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
@@ -78,6 +84,8 @@ class NotificationIntegrationTest {
 
     @BeforeEach
     void setUp() {
+        donationRepository.deleteAll();
+        donorResponseRepository.deleteAll();
         notificationRepository.deleteAll();
         bloodRequestRepository.deleteAll();
         donorProfileRepository.deleteAll();

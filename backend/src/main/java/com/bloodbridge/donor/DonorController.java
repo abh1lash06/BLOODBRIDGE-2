@@ -19,9 +19,23 @@ import org.springframework.web.bind.annotation.*;
 public class DonorController {
 
     private final DonorService donorService;
+    private final com.bloodbridge.donation.DonationService donationService;
 
-    public DonorController(DonorService donorService) {
+    public DonorController(DonorService donorService,
+                           com.bloodbridge.donation.DonationService donationService) {
         this.donorService = donorService;
+        this.donationService = donationService;
+    }
+
+    @GetMapping("/me/donations")
+    @PreAuthorize("hasRole('DONOR')")
+    public ResponseEntity<Page<com.bloodbridge.donation.dto.DonationResponse>> getMyDonations(
+            @AuthenticationPrincipal UserPrincipal currentUser,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        int pageSize = Math.min(size, 50);
+        Pageable pageable = PageRequest.of(page, pageSize);
+        return ResponseEntity.ok(donationService.getMyDonations(currentUser, pageable));
     }
 
     @GetMapping("/me")

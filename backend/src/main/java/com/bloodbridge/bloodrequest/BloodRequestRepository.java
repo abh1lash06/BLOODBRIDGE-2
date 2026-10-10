@@ -13,4 +13,5 @@ public interface BloodRequestRepository extends JpaRepository<BloodRequest, Long
     Page<BloodRequest> findByStatus(RequestStatus status, Pageable pageable);
     Page<BloodRequest> findByBloodGroupAndStatus(BloodGroup bloodGroup, RequestStatus status, Pageable pageable);
     List<BloodRequest> findByPatientIdAndStatus(Long patientId, RequestStatus status);
+    Page<BloodRequest> findByStatusInAndBloodGroupIn(java.util.Collection<RequestStatus> statuses, java.util.Collection<BloodGroup> bloodGroups, Pageable pageable);
 }

@@ -24,7 +24,7 @@ class FlywayMigrationTest {
 
         MigrateResult result = flyway.migrate();
         assertTrue(result.migrationsExecuted > 0, "At least one migration should be executed");
-        assertEquals("1", result.targetSchemaVersion, "Schema version should match V1");
+        assertEquals("2", result.targetSchemaVersion, "Schema version should match V2");
 
         // Verify repeatable migration check (subsequent migrate run does not fail or duplicate)
         MigrateResult repeatResult = flyway.migrate();

@@ -20,4 +20,8 @@ List<DonorProfile> findAllByVerificationStatusAndAvailableToDonateAndBloodGroup(
         VerificationStatus status,
         boolean available,
         BloodGroup bloodGroup);
+    List<DonorProfile> findByVerificationStatusAndAvailableToDonateAndBloodGroupIn(
+        VerificationStatus status,
+        boolean available,
+        java.util.Collection<BloodGroup> bloodGroups);
 }

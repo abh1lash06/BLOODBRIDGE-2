@@ -70,6 +70,12 @@ class DonorAndHospitalVerificationIntegrationTest {
     private com.bloodbridge.notification.NotificationRepository notificationRepository;
 
     @Autowired
+    private com.bloodbridge.bloodrequest.donorresponse.DonorResponseRepository donorResponseRepository;
+
+    @Autowired
+    private com.bloodbridge.donation.DonationRepository donationRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
@@ -77,6 +83,8 @@ class DonorAndHospitalVerificationIntegrationTest {
 
     @BeforeEach
     void setUp() {
+        donationRepository.deleteAll();
+        donorResponseRepository.deleteAll();
         notificationRepository.deleteAll();
         bloodRequestRepository.deleteAll();
         inventoryRepository.deleteAll();

@@ -72,6 +72,41 @@ export const bloodRequestApi = {
     });
     return response.data;
   },
+
+  /**
+   * List open requests matching the authenticated donor's blood group
+   * GET /api/blood-requests/matching?page=...&size=...
+   */
+  getMatchingRequestsForDonor: async ({ page = 0, size = 10 } = {}) => {
+    const response = await apiClient.get('/blood-requests/matching', {
+      params: { page, size },
+    });
+    return response.data;
+  },
+
+  /**
+   * Respond to an emergency blood request as a donor (ACCEPT or DECLINE)
+   * POST /api/blood-requests/{id}/respond
+   * @param {number|string} id
+   * @param {Object} data { action: 'ACCEPT'|'DECLINE', notes: '' }
+   */
+  respondToRequest: async (id, { action = 'ACCEPT', notes = '' } = {}) => {
+    const response = await apiClient.post(`/blood-requests/${id}/respond`, {
+      action,
+      notes,
+    });
+    return response.data;
+  },
+
+  /**
+   * Get donor responses for a blood request with authorized contact details
+   * GET /api/blood-requests/{id}/responses
+   * @param {number|string} id
+   */
+  getRequestResponses: async (id) => {
+    const response = await apiClient.get(`/blood-requests/${id}/responses`);
+    return response.data;
+  },
 };
 
 export default bloodRequestApi;

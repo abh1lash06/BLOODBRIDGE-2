@@ -19,6 +19,7 @@ import RegisterPage from '@/pages/auth/RegisterPage';
 
 // Donor Pages
 import DonorDashboardPage from '@/pages/donor/DonorDashboardPage';
+import DonationHistoryPage from '@/pages/donor/DonationHistoryPage';
 
 // Patient Pages
 import PatientRequestsPage from '@/pages/patient/PatientRequestsPage';
@@ -86,7 +87,7 @@ export const router = createBrowserRouter([
     ),
     children: [
       { index: true, element: <DonorDashboardPage /> },
-      { path: 'history', element: <DonorDashboardPage /> },
+      { path: 'history', element: <DonationHistoryPage /> },
     ],
   },
 

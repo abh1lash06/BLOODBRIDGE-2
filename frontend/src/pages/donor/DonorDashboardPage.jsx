@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Link } from 'react-router-dom';
 import {
   User,
   Heart,
@@ -13,8 +14,14 @@ import {
   Clock,
   Edit,
   Save,
+  Droplet,
+  Building2,
+  Send,
+  History,
+  ShieldCheck,
 } from 'lucide-react';
 import { donorApi } from '@/api/donor.api';
+import { bloodRequestApi } from '@/api/bloodRequest.api';
 import { donorProfileUpdateSchema } from '@/lib/validation';
 import { BLOOD_GROUPS, VERIFICATION_STATUSES } from '@/lib/constants';
 import {
@@ -78,6 +85,35 @@ export const DonorDashboardPage = () => {
   const onUpdateSubmit = (data) => {
     updateMutation.mutate(data);
   };
+
+  const isVerified = profile?.verificationStatus === VERIFICATION_STATUSES.VERIFIED;
+  const isAvailable = profile?.availableToDonate === true;
+
+  // Matching emergency blood requests
+  const { data: matchingData, isLoading: isMatchingLoading } = useQuery({
+    queryKey: ['donor', 'matching-requests'],
+    queryFn: () => bloodRequestApi.getMatchingRequestsForDonor({ page: 0, size: 10 }),
+    enabled: Boolean(profile?.bloodGroup),
+  });
+
+  const matchingRequests = matchingData?.content || [];
+
+  const respondMutation = useMutation({
+    mutationFn: ({ id, action }) => bloodRequestApi.respondToRequest(id, { action }),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['donor', 'matching-requests'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      if (variables.action === 'ACCEPT') {
+        toast.success('You have accepted this blood request! The patient and hospital have been notified.');
+      } else {
+        toast.info('You have declined this blood request.');
+      }
+    },
+    onError: (err) => {
+      const msg = extractErrorMessage(err, 'Failed to submit response.');
+      toast.error(msg);
+    },
+  });
 
   const getVerificationIcon = (status) => {
     switch (status) {
@@ -147,6 +183,131 @@ export const DonorDashboardPage = () => {
           </Badge>
         </div>
       </div>
+
+      {/* Quick Navigation to Donation History */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 p-4 bg-crimson-50/60 border border-crimson-200 rounded-2xl">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-crimson-600 text-white flex items-center justify-center shrink-0">
+            <History className="w-5 h-5" />
+          </div>
+          <div>
+            <h3 className="font-bold text-charcoal-900 text-sm">Official Donation History</h3>
+            <p className="text-xs text-charcoal-600">
+              {profile?.lastDonationDate
+                ? `Last donation recorded on ${formatDate(profile.lastDonationDate)}`
+                : 'View verified donation receipts and hospital completion records.'}
+            </p>
+          </div>
+        </div>
+        <Link to="/donor/history">
+          <Button variant="outline" size="sm" className="w-full sm:w-auto min-h-[44px]">
+            View Donation History
+          </Button>
+        </Link>
+      </div>
+
+      {/* Matching Emergency Blood Requests Section */}
+      <Card
+        title="Emergency Blood Requests Matching Your Blood Group"
+        subtitle={`Live requests clinically compatible with your ${profile.bloodGroup ? BLOOD_GROUPS.find((b) => b.code === profile.bloodGroup)?.label || profile.bloodGroup : 'blood'} type`}
+      >
+        {!isVerified ? (
+          <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-3 text-amber-800 text-sm">
+            <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+            <div>
+              <p className="font-bold">Verification Pending</p>
+              <p className="text-xs text-amber-700 mt-0.5">
+                Your profile is awaiting administrative review. Once verified, you will be able to directly accept emergency blood requests.
+              </p>
+            </div>
+          </div>
+        ) : !isAvailable ? (
+          <div className="p-4 bg-charcoal-50 border border-charcoal-200 rounded-xl flex items-start gap-3 text-charcoal-700 text-sm">
+            <Clock className="w-5 h-5 text-charcoal-500 shrink-0 mt-0.5" />
+            <div>
+              <p className="font-bold">Marked as Unavailable</p>
+              <p className="text-xs text-charcoal-600 mt-0.5">
+                You are currently marked as unavailable for donations. Edit your profile below to toggle availability back ON when ready to help.
+              </p>
+            </div>
+          </div>
+        ) : isMatchingLoading ? (
+          <CardSkeleton />
+        ) : matchingRequests.length === 0 ? (
+          <div className="text-center py-8 text-charcoal-500 space-y-2">
+            <Droplet className="w-10 h-10 text-crimson-400 mx-auto" />
+            <p className="text-sm font-semibold text-charcoal-700">No urgent requests awaiting donors right now</p>
+            <p className="text-xs text-charcoal-500 max-w-sm mx-auto">
+              Your profile is active and eligible. Whenever a matching emergency blood request is submitted by a hospital or patient, you will receive an immediate notification.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {matchingRequests.map((req) => (
+              <div
+                key={req.id}
+                className="p-4 rounded-xl border border-charcoal-200 bg-white hover:border-crimson-300 transition-all flex flex-col justify-between space-y-3"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <Badge variant="primary" size="lg" className="font-black text-sm">
+                      {req.bloodGroup}
+                    </Badge>
+                    <span className="text-xs font-bold text-charcoal-800">
+                      {req.unitsRequired} {req.unitsRequired === 1 ? 'unit' : 'units'} needed
+                    </span>
+                  </div>
+                  <Badge
+                    variant={req.urgency === 'CRITICAL' ? 'danger' : req.urgency === 'URGENT' ? 'warning' : 'default'}
+                    size="sm"
+                    className="font-bold"
+                  >
+                    {req.urgency}
+                  </Badge>
+                </div>
+
+                <div className="text-xs text-charcoal-600 space-y-1">
+                  <div className="flex items-center gap-1.5 font-medium text-charcoal-800">
+                    <Building2 className="w-3.5 h-3.5 text-crimson-600 shrink-0" />
+                    <span>{req.hospitalName || 'Regional Medical Facility'}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-charcoal-500">
+                    <Calendar className="w-3.5 h-3.5 shrink-0" />
+                    <span>Required by: {formatDate(req.requiredDate)}</span>
+                  </div>
+                  {req.notes && (
+                    <p className="text-charcoal-600 italic bg-charcoal-50 p-2 rounded mt-1.5">
+                      "{req.notes}"
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2 pt-2 border-t border-charcoal-100">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 min-h-[44px] text-xs"
+                    disabled={respondMutation.isPending}
+                    onClick={() => respondMutation.mutate({ id: req.id, action: 'DECLINE' })}
+                  >
+                    Decline
+                  </Button>
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    className="flex-1 min-h-[44px] text-xs"
+                    isLoading={respondMutation.isPending && respondMutation.variables?.id === req.id}
+                    onClick={() => respondMutation.mutate({ id: req.id, action: 'ACCEPT' })}
+                  >
+                    <CheckCircle className="w-3.5 h-3.5 mr-1" />
+                    Accept Request
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </Card>
 
       {/* Profile Details or Edit Form */}
       <Card
