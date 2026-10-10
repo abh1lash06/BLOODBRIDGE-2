@@ -18,34 +18,34 @@ export const LandingPage = () => {
   return (
     <div className="space-y-16 py-8">
       {/* Hero Section */}
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-crimson-700 via-crimson-600 to-crimson-800 text-white p-8 md:p-16 shadow-lg">
-        <div className="max-w-3xl space-y-6">
+      <section className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-crimson-700 via-crimson-600 to-crimson-800 text-white p-5 sm:p-8 md:p-16 shadow-lg">
+        <div className="max-w-3xl space-y-5 sm:space-y-6">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md text-xs font-semibold uppercase tracking-wider text-crimson-100 border border-white/20">
             <Droplet className="w-4 h-4 fill-crimson-300 text-crimson-300" />
             Reliable Blood Network
           </div>
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight leading-tight">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-tight">
             Connecting Lifelines When Every Second Counts.
           </h1>
-          <p className="text-lg md:text-xl text-crimson-100 max-w-2xl font-normal leading-relaxed">
+          <p className="text-base sm:text-lg md:text-xl text-crimson-100 max-w-2xl font-normal leading-relaxed">
             BloodBridge bridges the critical gap between blood donors, patients in urgent need, and verified hospital blood banks through a secure, coordinated platform.
           </p>
-          <div className="flex flex-wrap gap-4 pt-4">
-            <Link to="/register">
+          <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 pt-2 sm:pt-4">
+            <Link to="/register" className="w-full sm:w-auto">
               <Button
                 variant="secondary"
                 size="lg"
-                className="bg-white text-crimson-700 hover:bg-crimson-50 font-bold shadow-md"
+                className="w-full sm:w-auto bg-white text-crimson-700 hover:bg-crimson-50 font-bold shadow-md min-h-[44px]"
               >
                 Become a Blood Donor
                 <ArrowRight className="w-4 h-4 ml-1" />
               </Button>
             </Link>
-            <Link to="/register">
+            <Link to="/register" className="w-full sm:w-auto">
               <Button
                 variant="outline"
                 size="lg"
-                className="border-white text-white hover:bg-white/10"
+                className="w-full sm:w-auto border-white text-white hover:bg-white/10 min-h-[44px]"
               >
                 Request Blood
               </Button>
@@ -149,21 +149,21 @@ export const LandingPage = () => {
       </section>
 
       {/* Call to action card */}
-      <section className="bg-charcoal-900 text-white rounded-2xl p-8 md:p-12 text-center max-w-4xl mx-auto space-y-6">
+      <section className="bg-charcoal-900 text-white rounded-2xl p-6 sm:p-8 md:p-12 text-center max-w-4xl mx-auto space-y-6">
         <h2 className="text-2xl sm:text-3xl font-extrabold">
           Ready to save a life today?
         </h2>
         <p className="text-sm sm:text-base text-charcoal-300 max-w-xl mx-auto">
           Sign up as a voluntary blood donor or register your family account to coordinate emergency requests with certified medical institutions.
         </p>
-        <div className="flex justify-center gap-4">
-          <Link to="/register">
-            <Button variant="primary" size="lg">
+        <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 max-w-xs sm:max-w-none mx-auto">
+          <Link to="/register" className="w-full sm:w-auto">
+            <Button variant="primary" size="lg" className="w-full sm:w-auto min-h-[44px]">
               Get Started Now
             </Button>
           </Link>
-          <Link to="/login">
-            <Button variant="outline" size="lg" className="border-charcoal-700 text-white hover:bg-charcoal-800">
+          <Link to="/login" className="w-full sm:w-auto">
+            <Button variant="outline" size="lg" className="w-full sm:w-auto border-charcoal-700 text-white hover:bg-charcoal-800 min-h-[44px]">
               Sign In
             </Button>
           </Link>

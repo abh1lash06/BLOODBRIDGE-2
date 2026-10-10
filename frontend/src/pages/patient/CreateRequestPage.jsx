@@ -163,15 +163,16 @@ export const CreateRequestPage = () => {
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 pt-4 border-t border-charcoal-100">
-            <Link to="/patient">
-              <Button type="button" variant="outline">
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-4 border-t border-charcoal-100">
+            <Link to="/patient" className="w-full sm:w-auto">
+              <Button type="button" variant="outline" className="w-full sm:w-auto min-h-[44px]">
                 Cancel
               </Button>
             </Link>
             <Button
               type="submit"
               variant="primary"
+              className="w-full sm:w-auto min-h-[44px]"
               isLoading={isSubmitting || createMutation.isPending}
             >
               <Send className="w-4 h-4 mr-1.5" />

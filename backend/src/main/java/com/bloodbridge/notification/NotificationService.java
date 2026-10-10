@@ -37,7 +37,7 @@ public class NotificationService {
                 .map(this::toResponse);
     }
 
-    public void markAsRead(UserPrincipal currentUser, Long notificationId) {
+    public NotificationResponse markAsRead(UserPrincipal currentUser, Long notificationId) {
         Notification notification = notificationRepository.findById(notificationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Notification not found"));
 
@@ -46,7 +46,8 @@ public class NotificationService {
         }
 
         notification.setReadStatus(true);
-        notificationRepository.save(notification);
+        Notification saved = notificationRepository.save(notification);
+        return toResponse(saved);
     }
 
     public void markAllAsRead(UserPrincipal currentUser) {

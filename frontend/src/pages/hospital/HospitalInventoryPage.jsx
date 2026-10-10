@@ -51,7 +51,7 @@ export const HospitalInventoryPage = () => {
   const updateMutation = useMutation({
     mutationFn: (data) => inventoryApi.updateStock(data),
     onSuccess: () => {
-      queryClient.invalidateQueries(['hospital', 'inventory']);
+      queryClient.invalidateQueries({ queryKey: ['hospital', 'inventory'] });
       toast.success('Inventory units updated successfully.');
       setEditingStock(null);
     },
@@ -87,7 +87,7 @@ export const HospitalInventoryPage = () => {
   return (
     <div className="space-y-6">
       {/* Hospital Header and Verification Gate Notice */}
-      <div className="p-6 bg-white rounded-2xl border border-charcoal-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="p-4 sm:p-6 bg-white rounded-2xl border border-charcoal-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-black text-charcoal-900">
             {hospital?.hospitalName}
@@ -228,11 +228,12 @@ export const HospitalInventoryPage = () => {
             hint="Enter minimum 0. Real-time updates reflect immediately."
           />
 
-          <div className="flex justify-end gap-2 pt-2">
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-2">
             <Button
               type="button"
               variant="outline"
               size="sm"
+              className="w-full sm:w-auto min-h-[44px]"
               onClick={() => setEditingStock(null)}
             >
               Cancel
@@ -241,6 +242,7 @@ export const HospitalInventoryPage = () => {
               type="submit"
               variant="primary"
               size="sm"
+              className="w-full sm:w-auto min-h-[44px]"
               isLoading={updateMutation.isPending}
             >
               <Save className="w-4 h-4 mr-1" />

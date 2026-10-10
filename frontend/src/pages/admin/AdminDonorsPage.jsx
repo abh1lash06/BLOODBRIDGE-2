@@ -43,7 +43,7 @@ export const AdminDonorsPage = () => {
   const verifyMutation = useMutation({
     mutationFn: (id) => adminApi.verifyDonor(id),
     onSuccess: () => {
-      queryClient.invalidateQueries(['admin', 'pendingDonors']);
+      queryClient.invalidateQueries({ queryKey: ['admin', 'pendingDonors'] });
       toast.success('Donor has been successfully verified.');
       setVerifyingDonor(null);
     },
@@ -58,7 +58,7 @@ export const AdminDonorsPage = () => {
   const rejectMutation = useMutation({
     mutationFn: ({ id, reason }) => adminApi.rejectDonor(id, reason),
     onSuccess: () => {
-      queryClient.invalidateQueries(['admin', 'pendingDonors']);
+      queryClient.invalidateQueries({ queryKey: ['admin', 'pendingDonors'] });
       toast.success('Donor verification request has been rejected.');
       setRejectingDonor(null);
       setRejectReason('');
@@ -102,65 +102,128 @@ export const AdminDonorsPage = () => {
             />
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-charcoal-50 border-b border-charcoal-200 text-xs font-semibold text-charcoal-500 uppercase tracking-wider">
-                <tr>
-                  <th className="py-3.5 px-4">Full Name</th>
-                  <th className="py-3.5 px-4">Blood Group</th>
-                  <th className="py-3.5 px-4">Birth Date</th>
-                  <th className="py-3.5 px-4">Location</th>
-                  <th className="py-3.5 px-4">Contact</th>
-                  <th className="py-3.5 px-4 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-charcoal-100">
-                {donors.map((donor) => (
-                  <tr key={donor.id} className="hover:bg-charcoal-50/50 transition-colors">
-                    <td className="py-3.5 px-4 font-semibold text-charcoal-900">
-                      {donor.fullName}
-                      <span className="block text-xs font-normal text-charcoal-400">
-                        {donor.email}
-                      </span>
-                    </td>
-                    <td className="py-3.5 px-4 font-bold text-crimson-700">
+          <>
+            {/* Mobile Cards View (< 768px) */}
+            <div className="block md:hidden divide-y divide-charcoal-100">
+              {donors.map((donor) => (
+                <div key={donor.id} className="p-4 space-y-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <div>
+                      <p className="font-bold text-charcoal-900 text-sm">
+                        {donor.fullName}
+                      </p>
+                      <p className="text-xs text-charcoal-500">{donor.email}</p>
+                    </div>
+                    <span className="font-black text-crimson-600 text-lg">
                       {donor.bloodGroup || 'Unspecified'}
-                    </td>
-                    <td className="py-3.5 px-4 text-charcoal-600 text-xs">
-                      {formatDate(donor.dateOfBirth)}
-                    </td>
-                    <td className="py-3.5 px-4 text-charcoal-600 text-xs">
-                      {donor.city ? `${donor.city}, ${donor.state || ''}` : 'None'}
-                    </td>
-                    <td className="py-3.5 px-4 text-charcoal-600 text-xs">
-                      {donor.phoneNumber || 'None'}
-                    </td>
-                    <td className="py-3.5 px-4 text-right space-x-2">
-                      <Button
-                        variant="success"
-                        size="sm"
-                        onClick={() => setVerifyingDonor(donor)}
-                      >
-                        <CheckCircle className="w-3.5 h-3.5 mr-1" />
-                        Verify
-                      </Button>
-                      <Button
-                        variant="danger"
-                        size="sm"
-                        onClick={() => {
-                          setRejectingDonor(donor);
-                          setRejectReason('');
-                        }}
-                      >
-                        <XCircle className="w-3.5 h-3.5 mr-1" />
-                        Reject
-                      </Button>
-                    </td>
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 text-xs text-charcoal-600">
+                    <div>
+                      <span className="text-charcoal-400 block mb-0.5">Birth Date</span>
+                      <span className="font-medium text-charcoal-800">{formatDate(donor.dateOfBirth)}</span>
+                    </div>
+                    <div>
+                      <span className="text-charcoal-400 block mb-0.5">Contact</span>
+                      <span className="font-medium text-charcoal-800">{donor.phoneNumber || 'None'}</span>
+                    </div>
+                    <div className="col-span-2">
+                      <span className="text-charcoal-400 block mb-0.5">Location</span>
+                      <span className="font-medium text-charcoal-800">
+                        {donor.city ? `${donor.city}, ${donor.state || ''}` : 'None'}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t border-charcoal-100 flex justify-end gap-2">
+                    <Button
+                      variant="success"
+                      size="sm"
+                      onClick={() => setVerifyingDonor(donor)}
+                      className="min-h-[38px] text-xs"
+                    >
+                      <CheckCircle className="w-3.5 h-3.5 mr-1" />
+                      Verify
+                    </Button>
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      onClick={() => {
+                        setRejectingDonor(donor);
+                        setRejectReason('');
+                      }}
+                      className="min-h-[38px] text-xs"
+                    >
+                      <XCircle className="w-3.5 h-3.5 mr-1" />
+                      Reject
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop Table View (>= 768px) */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead className="bg-charcoal-50 border-b border-charcoal-200 text-xs font-semibold text-charcoal-500 uppercase tracking-wider">
+                  <tr>
+                    <th className="py-3.5 px-4">Full Name</th>
+                    <th className="py-3.5 px-4">Blood Group</th>
+                    <th className="py-3.5 px-4">Birth Date</th>
+                    <th className="py-3.5 px-4">Location</th>
+                    <th className="py-3.5 px-4">Contact</th>
+                    <th className="py-3.5 px-4 text-right">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-charcoal-100">
+                  {donors.map((donor) => (
+                    <tr key={donor.id} className="hover:bg-charcoal-50/50 transition-colors">
+                      <td className="py-3.5 px-4 font-semibold text-charcoal-900">
+                        {donor.fullName}
+                        <span className="block text-xs font-normal text-charcoal-400">
+                          {donor.email}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-4 font-bold text-crimson-700">
+                        {donor.bloodGroup || 'Unspecified'}
+                      </td>
+                      <td className="py-3.5 px-4 text-charcoal-600 text-xs">
+                        {formatDate(donor.dateOfBirth)}
+                      </td>
+                      <td className="py-3.5 px-4 text-charcoal-600 text-xs">
+                        {donor.city ? `${donor.city}, ${donor.state || ''}` : 'None'}
+                      </td>
+                      <td className="py-3.5 px-4 text-charcoal-600 text-xs">
+                        {donor.phoneNumber || 'None'}
+                      </td>
+                      <td className="py-3.5 px-4 text-right space-x-2">
+                        <Button
+                          variant="success"
+                          size="sm"
+                          onClick={() => setVerifyingDonor(donor)}
+                        >
+                          <CheckCircle className="w-3.5 h-3.5 mr-1" />
+                          Verify
+                        </Button>
+                        <Button
+                          variant="danger"
+                          size="sm"
+                          onClick={() => {
+                            setRejectingDonor(donor);
+                            setRejectReason('');
+                          }}
+                        >
+                          <XCircle className="w-3.5 h-3.5 mr-1" />
+                          Reject
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
 
         <Pagination

@@ -111,24 +111,24 @@ export const DonorDashboardPage = () => {
   return (
     <div className="space-y-8">
       {/* Top Banner with Verification Status */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 bg-white rounded-2xl border border-charcoal-200 shadow-sm">
-        <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-crimson-600 text-white flex items-center justify-center font-black text-xl shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 sm:p-6 bg-white rounded-2xl border border-charcoal-200 shadow-sm">
+        <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-crimson-600 text-white flex items-center justify-center font-black text-lg sm:text-xl shadow-sm shrink-0">
             {profile.bloodGroup ? (
               BLOOD_GROUPS.find((b) => b.code === profile.bloodGroup)?.label || 'O+'
             ) : (
-              <Heart className="w-7 h-7" />
+              <Heart className="w-6 h-6 sm:w-7 sm:h-7" />
             )}
           </div>
-          <div>
-            <h1 className="text-2xl font-black text-charcoal-900">
+          <div className="min-w-0">
+            <h1 className="text-xl sm:text-2xl font-black text-charcoal-900 truncate">
               {profile.fullName}
             </h1>
-            <p className="text-sm text-charcoal-500">{profile.email}</p>
+            <p className="text-xs sm:text-sm text-charcoal-500 truncate">{profile.email}</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-charcoal-200 bg-charcoal-50">
             {getVerificationIcon(profile.verificationStatus)}
             <div className="text-xs">

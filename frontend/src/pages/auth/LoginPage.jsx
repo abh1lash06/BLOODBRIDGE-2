@@ -59,10 +59,10 @@ export const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-[80vh] flex items-center justify-center py-6 sm:py-12 px-3 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-6">
         <div className="text-center">
-          <h1 className="text-3xl font-extrabold text-charcoal-900 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-charcoal-900 tracking-tight">
             Welcome to BloodBridge
           </h1>
           <p className="mt-2 text-sm text-charcoal-600">
@@ -70,7 +70,7 @@ export const LoginPage = () => {
           </p>
         </div>
 
-        <Card className="p-8 shadow-md">
+        <Card className="p-5 sm:p-8 shadow-md">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
             <Input
               id="email"

@@ -1,8 +1,12 @@
 import axios from 'axios';
 import { STORAGE_KEYS } from '@/lib/constants';
 
-// Compute the base URL: ensure no trailing slash, and ensure /api is present if not already in URL
-const rawBaseUrl = import.meta.env.VITE_API_URL || '';
+// Compute the base URL: prioritize VITE_API_URL, falling back to production Render backend in prod or localhost in dev
+const rawBaseUrl =
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.PROD
+    ? 'https://bloodbridge-2-9d5r.onrender.com'
+    : 'http://localhost:8080');
 const cleanBaseUrl = rawBaseUrl.replace(/\/+$/, '');
 const baseURL = cleanBaseUrl.endsWith('/api')
   ? cleanBaseUrl

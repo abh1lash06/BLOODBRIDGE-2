@@ -60,8 +60,12 @@ class RoleBasedAccessIntegrationTest {
     @Autowired
     private com.bloodbridge.patient.PatientProfileRepository patientProfileRepository;
 
+    @Autowired
+    private com.bloodbridge.notification.NotificationRepository notificationRepository;
+
     @BeforeEach
     void setUp() {
+        notificationRepository.deleteAll();
         bloodRequestRepository.deleteAll();
         inventoryRepository.deleteAll();
         hospitalRepository.deleteAll();

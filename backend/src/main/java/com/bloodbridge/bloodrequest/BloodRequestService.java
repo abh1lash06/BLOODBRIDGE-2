@@ -25,7 +25,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -84,6 +86,11 @@ public class BloodRequestService {
                 NotificationType.BLOOD_REQUEST_CREATED
         );
 
+        Set<Long> notifiedUserIds = new HashSet<>();
+        if (patientProfile.getUser() != null && patientProfile.getUser().getId() != null) {
+            notifiedUserIds.add(patientProfile.getUser().getId());
+        }
+
         List<DonorProfile> matchingDonors =
                 donorProfileRepository.findAllByVerificationStatusAndAvailableToDonateAndBloodGroup(
                         VerificationStatus.VERIFIED,
@@ -91,16 +98,24 @@ public class BloodRequestService {
                         request.getBloodGroup()
                 );
 
-        for (DonorProfile donor : matchingDonors) {
-            notificationService.createNotification(
-                    donor.getUser(),
-                    "Matching Blood Request",
-                    "A new blood request for " + request.getBloodGroup().getLabel()
-                            + " has been created. Units required: "
-                            + request.getUnitsRequired()
-                            + ". Please check BloodBridge for details.",
-                    NotificationType.BLOOD_REQUEST_CREATED
-            );
+        if (matchingDonors != null && !matchingDonors.isEmpty()) {
+            for (DonorProfile donor : matchingDonors) {
+                if (donor != null && donor.getUser() != null && donor.getUser().getId() != null) {
+                    Long donorUserId = donor.getUser().getId();
+                    if (!notifiedUserIds.contains(donorUserId) && donor.getUser().isEnabled()) {
+                        notifiedUserIds.add(donorUserId);
+                        notificationService.createNotification(
+                                donor.getUser(),
+                                "Matching Blood Request",
+                                "A new blood request for " + request.getBloodGroup().getLabel()
+                                        + " has been created. Units required: "
+                                        + request.getUnitsRequired()
+                                        + ". Please check BloodBridge for details.",
+                                NotificationType.BLOOD_REQUEST_CREATED
+                        );
+                    }
+                }
+            }
         }
 
         return toResponse(saved);

@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
     Page<Notification> findByRecipientIdOrderByCreatedAtDesc(Long recipientId, Pageable pageable);
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("UPDATE Notification n SET n.readStatus = true WHERE n.recipient.id = :userId")
     void markAllAsReadByRecipientId(@Param("userId") Long userId);
 

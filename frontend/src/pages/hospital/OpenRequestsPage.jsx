@@ -35,8 +35,8 @@ export const OpenRequestsPage = () => {
     mutationFn: (id) =>
       bloodRequestApi.updateRequest(id, { status: REQUEST_STATUSES.APPROVED }),
     onSuccess: () => {
-      queryClient.invalidateQueries(['requests', 'open']);
-      queryClient.invalidateQueries(['hospital', 'assignedRequests']);
+      queryClient.invalidateQueries({ queryKey: ['requests', 'open'] });
+      queryClient.invalidateQueries({ queryKey: ['hospital', 'assignedRequests'] });
       toast.success('You have accepted and approved this blood request.');
       setAcceptingReq(null);
     },
@@ -80,57 +80,110 @@ export const OpenRequestsPage = () => {
             />
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-charcoal-50 border-b border-charcoal-200 text-xs font-semibold text-charcoal-500 uppercase tracking-wider">
-                <tr>
-                  <th className="py-3.5 px-4">Patient</th>
-                  <th className="py-3.5 px-4">Blood Group</th>
-                  <th className="py-3.5 px-4">Units</th>
-                  <th className="py-3.5 px-4">Urgency</th>
-                  <th className="py-3.5 px-4">Required Date</th>
-                  <th className="py-3.5 px-4">Notes</th>
-                  <th className="py-3.5 px-4 text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-charcoal-100">
-                {requests.map((req) => (
-                  <tr key={req.id} className="hover:bg-charcoal-50/50 transition-colors">
-                    <td className="py-3.5 px-4 font-semibold text-charcoal-900">
-                      {req.patientName || `Patient #${req.patientId}`}
-                    </td>
-                    <td className="py-3.5 px-4 font-bold text-crimson-700">
-                      {req.bloodGroup || req.bloodGroupCode}
-                    </td>
-                    <td className="py-3.5 px-4 text-charcoal-800">
-                      {req.unitsRequired} units
-                    </td>
-                    <td className="py-3.5 px-4">
-                      <Badge variant={getUrgencyBadgeVariant(req.urgency)}>
-                        {req.urgency}
-                      </Badge>
-                    </td>
-                    <td className="py-3.5 px-4 text-charcoal-600 text-xs">
-                      {formatDate(req.requiredDate)}
-                    </td>
-                    <td className="py-3.5 px-4 text-charcoal-500 text-xs max-w-xs truncate">
-                      {req.notes || 'None'}
-                    </td>
-                    <td className="py-3.5 px-4 text-right">
-                      <Button
-                        variant="primary"
-                        size="sm"
-                        onClick={() => setAcceptingReq(req)}
-                      >
-                        <Check className="w-3.5 h-3.5 mr-1" />
-                        Accept & Approve
-                      </Button>
-                    </td>
+          <>
+            {/* Mobile Cards View (< 768px) */}
+            <div className="block md:hidden divide-y divide-charcoal-100">
+              {requests.map((req) => (
+                <div key={req.id} className="p-4 space-y-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <div>
+                      <p className="font-bold text-charcoal-900 text-sm">
+                        {req.patientName || `Patient #${req.patientId}`}
+                      </p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="font-black text-crimson-600 text-base">
+                          {req.bloodGroup || req.bloodGroupCode}
+                        </span>
+                        <span className="text-xs text-charcoal-600">
+                          {req.unitsRequired} {req.unitsRequired === 1 ? 'unit' : 'units'}
+                        </span>
+                      </div>
+                    </div>
+                    <Badge variant={getUrgencyBadgeVariant(req.urgency)}>
+                      {req.urgency}
+                    </Badge>
+                  </div>
+
+                  <div className="text-xs text-charcoal-600 space-y-1">
+                    <div>
+                      <span className="text-charcoal-400">Required By: </span>
+                      <span className="font-medium text-charcoal-800">{formatDate(req.requiredDate)}</span>
+                    </div>
+                    {req.notes && (
+                      <p className="text-charcoal-500 italic bg-charcoal-50 p-2 rounded">
+                        "{req.notes}"
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="pt-2 border-t border-charcoal-100 flex justify-end">
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      onClick={() => setAcceptingReq(req)}
+                      className="min-h-[38px] text-xs"
+                    >
+                      <Check className="w-3.5 h-3.5 mr-1" />
+                      Accept & Approve
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop Table View (>= 768px) */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead className="bg-charcoal-50 border-b border-charcoal-200 text-xs font-semibold text-charcoal-500 uppercase tracking-wider">
+                  <tr>
+                    <th className="py-3.5 px-4">Patient</th>
+                    <th className="py-3.5 px-4">Blood Group</th>
+                    <th className="py-3.5 px-4">Units</th>
+                    <th className="py-3.5 px-4">Urgency</th>
+                    <th className="py-3.5 px-4">Required Date</th>
+                    <th className="py-3.5 px-4">Notes</th>
+                    <th className="py-3.5 px-4 text-right">Action</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-charcoal-100">
+                  {requests.map((req) => (
+                    <tr key={req.id} className="hover:bg-charcoal-50/50 transition-colors">
+                      <td className="py-3.5 px-4 font-semibold text-charcoal-900">
+                        {req.patientName || `Patient #${req.patientId}`}
+                      </td>
+                      <td className="py-3.5 px-4 font-bold text-crimson-700">
+                        {req.bloodGroup || req.bloodGroupCode}
+                      </td>
+                      <td className="py-3.5 px-4 text-charcoal-800">
+                        {req.unitsRequired} units
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <Badge variant={getUrgencyBadgeVariant(req.urgency)}>
+                          {req.urgency}
+                        </Badge>
+                      </td>
+                      <td className="py-3.5 px-4 text-charcoal-600 text-xs">
+                        {formatDate(req.requiredDate)}
+                      </td>
+                      <td className="py-3.5 px-4 text-charcoal-500 text-xs max-w-xs truncate">
+                        {req.notes || 'None'}
+                      </td>
+                      <td className="py-3.5 px-4 text-right">
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          onClick={() => setAcceptingReq(req)}
+                        >
+                          <Check className="w-3.5 h-3.5 mr-1" />
+                          Accept & Approve
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
 
         <Pagination
