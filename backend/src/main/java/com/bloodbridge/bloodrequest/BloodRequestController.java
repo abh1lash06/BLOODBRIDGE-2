@@ -69,4 +69,28 @@ public class BloodRequestController {
                                                                           Pageable pageable) {
         return ResponseEntity.ok(bloodRequestService.getHospitalRequests(currentUser, pageable));
     }
+
+    @PostMapping("/{id}/respond")
+    @PreAuthorize("hasRole('DONOR')")
+    public ResponseEntity<com.bloodbridge.bloodrequest.dto.DonorResponseDTO> respondToRequest(
+            @AuthenticationPrincipal UserPrincipal currentUser,
+            @PathVariable Long id,
+            @RequestBody(required = false) com.bloodbridge.bloodrequest.dto.DonorRespondRequest dto) {
+        return ResponseEntity.ok(bloodRequestService.respondToRequest(currentUser, id, dto));
+    }
+
+    @GetMapping("/{id}/responses")
+    public ResponseEntity<java.util.List<com.bloodbridge.bloodrequest.dto.DonorResponseDTO>> getRequestResponses(
+            @AuthenticationPrincipal UserPrincipal currentUser,
+            @PathVariable Long id) {
+        return ResponseEntity.ok(bloodRequestService.getRequestResponses(currentUser, id));
+    }
+
+    @GetMapping("/matching")
+    @PreAuthorize("hasRole('DONOR')")
+    public ResponseEntity<Page<BloodRequestResponse>> getMatchingRequests(
+            @AuthenticationPrincipal UserPrincipal currentUser,
+            Pageable pageable) {
+        return ResponseEntity.ok(bloodRequestService.getMatchingRequestsForDonor(currentUser, pageable));
+    }
 }

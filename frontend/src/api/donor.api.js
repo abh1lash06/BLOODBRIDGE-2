@@ -39,6 +39,17 @@ export const donorApi = {
     const response = await apiClient.get('/donors', { params });
     return response.data;
   },
+
+  /**
+   * Get authenticated donor's donation records
+   * GET /api/donors/me/donations?page=...&size=...
+   */
+  getMyDonations: async ({ page = 0, size = 20 } = {}) => {
+    const response = await apiClient.get('/donors/me/donations', {
+      params: { page, size },
+    });
+    return response.data;
+  },
 };
 
 export default donorApi;

@@ -38,6 +38,7 @@ export function getStatusBadgeVariant(status) {
     case 'VERIFIED':
     case 'APPROVED':
     case 'FULFILLED':
+    case 'COMPLETED':
       return 'success';
     case 'PENDING':
       return 'warning';

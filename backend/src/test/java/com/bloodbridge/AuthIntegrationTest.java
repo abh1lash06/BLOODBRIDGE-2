@@ -44,8 +44,16 @@ class AuthIntegrationTest {
     @Autowired
     private com.bloodbridge.notification.NotificationRepository notificationRepository;
 
+    @Autowired
+    private com.bloodbridge.bloodrequest.donorresponse.DonorResponseRepository donorResponseRepository;
+
+    @Autowired
+    private com.bloodbridge.donation.DonationRepository donationRepository;
+
     @BeforeEach
     void setUp() {
+        donationRepository.deleteAll();
+        donorResponseRepository.deleteAll();
         notificationRepository.deleteAll();
         patientProfileRepository.deleteAll();
         donorProfileRepository.deleteAll();
